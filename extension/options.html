@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>闲鱼商品监控 · 设置</title>
+  <link rel="stylesheet" href="options.css">
+  <script src="options.js" defer></script>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>闲鱼商品监控</h1>
+      <p>按关键词和价格查找商品，发现新匹配时通知你配置的飞书群。</p>
+    </header>
+    <section class="rule-picker" aria-label="监控条件列表">
+      <label for="rule-select">选择监控条件</label>
+      <select id="rule-select" disabled></select>
+      <div class="actions">
+        <button id="add" type="button" disabled>新增监控条件</button>
+        <button id="remove" type="button" disabled>删除所选条件</button>
+      </div>
+      <p id="rule-summary" class="hint"></p>
+    </section>
+    <div class="layout">
+      <form id="settings" autocomplete="off">
+        <fieldset id="filters" disabled>
+          <legend>搜索条件</legend>
+          <label for="keyword">商品关键词</label>
+          <input id="keyword" type="text" maxlength="80" required placeholder="输入要监控的商品关键词" aria-describedby="keyword-help">
+          <small id="keyword-help">一组填写一个目标，多个关键词用空格分隔时须全部匹配。其他目标请点击「新增监控条件」。</small>
+          <div class="pair">
+            <div>
+              <label for="min">最低价（元）</label>
+              <input id="min" type="text" inputmode="decimal" pattern="[0-9]{1,9}(\.[0-9]{1,2})?" placeholder="不限" title="请输入非负金额，最多两位小数">
+            </div>
+            <div>
+              <label for="max">最高价（元）</label>
+              <input id="max" type="text" inputmode="decimal" pattern="[0-9]{1,9}(\.[0-9]{1,2})?" placeholder="不限" title="请输入非负金额，最多两位小数">
+            </div>
+          </div>
+          <label for="minutes">检测间隔（分钟）</label>
+          <input id="minutes" class="short" type="number" min="5" max="1440" step="1" value="10" required aria-describedby="interval-help">
+          <small id="interval-help">可选 5 至 1440 分钟。每组有独立搜索标签和检测计划，多组到期会按先后顺序错开检查。</small>
+        </fieldset>
+        <fieldset id="delivery" disabled>
+          <legend>飞书通知</legend>
+          <p class="instructions">在接收通知的飞书群设置里添加自定义机器人，命名为「闲鱼商品监控」。请只填写这个新机器人的地址。若启用了自定义关键词，请设置为「闲鱼监控」。</p>
+          <label for="webhook">Webhook 地址 <span id="webhook-state"></span></label>
+          <input id="webhook" type="password" autocomplete="new-password" spellcheck="false" placeholder="粘贴新机器人的 Webhook 地址" aria-describedby="credential-help">
+          <label class="check"><input id="clear-webhook" type="checkbox">保存时清除地址和密钥</label>
+          <label for="secret">签名密钥（选填） <span id="secret-state"></span></label>
+          <input id="secret" type="password" autocomplete="new-password" spellcheck="false" maxlength="512" placeholder="开启签名校验后填写" aria-describedby="credential-help">
+          <label class="check"><input id="clear-secret" type="checkbox">保存时清除密钥</label>
+          <small id="credential-help">留空会保留已保存的值。更换地址时，若新机器人启用了签名校验，请同时填入新密钥。</small>
+        <button id="saveDelivery" type="button" disabled>保存飞书设置</button>
+        </fieldset>
+        <div class="save-row">
+          <button id="save" class="primary" type="submit" disabled>保存当前条件</button>
+          <span id="edit-state" role="status"></span>
+        </div>
+      </form>
+      <aside aria-label="运行面板">
+        <section>
+          <div class="section-heading"><h2>监控状态</h2><span id="running">读取中</span></div>
+          <p id="status"></p>
+          <dl>
+            <div><dt>上次成功检测</dt><dd id="last-at">—</dd></div>
+            <div><dt>下次计划检测</dt><dd id="next-at">—</dd></div>
+            <div><dt>上次检测匹配</dt><dd id="matched">—</dd></div>
+          </dl>
+          <div class="actions">
+            <button id="start" type="button" class="primary" disabled>开始监控</button>
+            <button id="stop" type="button" disabled>暂停监控</button>
+          </div>
+          <p class="hint">每组首次运行先记录已有商品。新增条件后可分别开始，多组可同时保持运行。</p>
+        </section>
+        <section id="preview-panel">
+          <h2>预览与测试</h2>
+          <p class="hint">预览会打开或读取闲鱼搜索页，无需配置机器人。测试消息会发到已保存的机器人所在群。</p>
+          <div class="actions">
+            <button id="preview" type="button" disabled>预览匹配商品</button>
+            <button id="test" type="button" disabled>发送测试消息</button>
+          </div>
+        </section>
+        <section id="results" hidden>
+          <h2>本次预览</h2>
+          <p id="preview-count"></p>
+          <ul id="preview-list"></ul>
+        </section>
+      </aside>
+    </div>
+    <p id="feedback" role="status" aria-live="polite" aria-atomic="true"></p>
+  </main>
+</body>
+</html>
